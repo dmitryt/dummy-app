@@ -5,7 +5,6 @@ require('dotenv').config();
 const express = require('express');
 const http = require('http');
 const path = require('path');
-const s3Proxy = require('s3-proxy');
 
 const logger = require('./logger');
 
@@ -32,14 +31,9 @@ app.get('/error', (req, res) => {
   res.sendFile(path.join(TEMPLATES_PATH, 'error.html'));
 });
 
-app.get('/static/*', s3Proxy({
-  bucket: process.env.S3_BUCKET,
-  prefix: process.env.S3_PREFIX,
-  accessKeyId: process.env.S3_ACCESS_KEY,
-  secretAccessKey: process.env.S3_SECRET_KEY,
-  overrideCacheControl: 'max-age=100000',
-  defaultKey: 'index.html'
-}));
+app.get('/static/*', (req, res) => {
+  res.redirect(`${process.env.S3_CLOUDFRONT}/static/${req.params[0]}`);
+});
 
 const server = http.createServer(app);
 
