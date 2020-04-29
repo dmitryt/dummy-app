@@ -18,6 +18,8 @@ const app = express();
 app.get('/', (req, res) => {
   res.sendFile(path.join(TEMPLATES_PATH, 'index.html'));
 });
+// In Dev mode get static from local folder
+app.use('/static', express.static(__dirname + '/static'));
 app.get('/success', (req, res) => {
   logger.info('Inline success logs were sent');
   res.sendFile(path.join(TEMPLATES_PATH, 'success.html'));
@@ -29,10 +31,6 @@ app.get('/warning', (req, res) => {
 app.get('/error', (req, res) => {
   logger.error('Inline error logs were sent');
   res.sendFile(path.join(TEMPLATES_PATH, 'error.html'));
-});
-
-app.get('/static/*', (req, res) => {
-  res.redirect(`${process.env.S3_CLOUDFRONT}/static/${req.params[0]}`);
 });
 
 const server = http.createServer(app);
